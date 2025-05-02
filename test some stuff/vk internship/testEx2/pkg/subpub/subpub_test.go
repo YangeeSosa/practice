@@ -8,7 +8,10 @@ import (
 )
 
 func TestBasicSubscribePublish(t *testing.T) {
-	sp := NewSubPub()
+	sp, err := NewSubPub()
+	if err != nil {
+		t.Fatalf("Ошибка создания SubPub: %v", err)
+	}
 	received := make(chan interface{}, 1)
 
 	sub, err := sp.Subscribe("тест", func(msg interface{}) {
@@ -37,7 +40,10 @@ func TestBasicSubscribePublish(t *testing.T) {
 }
 
 func TestMultipleSubscribers(t *testing.T) {
-	sp := NewSubPub()
+	sp, err := NewSubPub()
+	if err != nil {
+		t.Fatalf("Ошибка создания SubPub: %v", err)
+	}
 	var wg sync.WaitGroup
 	subscriberCount := 10
 	messageCount := 0
@@ -59,7 +65,7 @@ func TestMultipleSubscribers(t *testing.T) {
 	}
 
 	// Публикуем сообщение
-	err := sp.Publish("тест", "тестовое сообщение")
+	err = sp.Publish("тест", "тестовое сообщение")
 	if err != nil {
 		t.Fatalf("Ошибка публикации: %v", err)
 	}
@@ -73,7 +79,10 @@ func TestMultipleSubscribers(t *testing.T) {
 }
 
 func TestUnsubscribe(t *testing.T) {
-	sp := NewSubPub()
+	sp, err := NewSubPub()
+	if err != nil {
+		t.Fatalf("Ошибка создания SubPub: %v", err)
+	}
 	received := make(chan interface{}, 1)
 
 	sub, err := sp.Subscribe("тест", func(msg interface{}) {
@@ -102,11 +111,14 @@ func TestUnsubscribe(t *testing.T) {
 }
 
 func TestClose(t *testing.T) {
-	sp := NewSubPub()
+	sp, err := NewSubPub()
+	if err != nil {
+		t.Fatalf("Ошибка создания SubPub: %v", err)
+	}
 	ctx := context.Background()
 
 	// Подписываемся
-	_, err := sp.Subscribe("тест", func(msg interface{}) {})
+	_, err = sp.Subscribe("тест", func(msg interface{}) {})
 	if err != nil {
 		t.Fatalf("Ошибка подписки: %v", err)
 	}

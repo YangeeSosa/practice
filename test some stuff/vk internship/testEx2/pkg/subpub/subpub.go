@@ -2,16 +2,21 @@ package subpub
 
 import (
 	"context"
+	"errors"
 	"sync"
 )
 
 type MessageHandler func(msg interface{})
 
-type Subscription struct {
+type Subscription interface {
+	Unsubscribe()
+}
+
+type subscription struct {
 	cancel func()
 }
 
-func (s *Subscription) Unsubscribe() {
+func (s *subscription) Unsubscribe() {
 	if s.cancel != nil {
 		s.cancel()
 	}
@@ -29,15 +34,19 @@ type subPub struct {
 	closed      bool
 }
 
-func NewSubPub() SubPub {
-	return &subPub{
-		subscribers: make(map[string][]chan interface{}),
+func NewSubPub() (SubPub, error) {
+	subscribers := make(map[string][]chan interface{})
+	if subscribers == nil {
+		return nil, errors.New("не удалось создать map для подписчиков")
 	}
+	return &subPub{
+		subscribers: subscribers,
+	}, nil
 }
 
 func (sp *subPub) Subscribe(subject string, cb MessageHandler) (Subscription, error) {
 	if sp.closed {
-		return Subscription{}, context.Canceled
+		return nil, context.Canceled
 	}
 
 	sp.mu.Lock()
@@ -77,7 +86,7 @@ func (sp *subPub) Subscribe(subject string, cb MessageHandler) (Subscription, er
 		}
 	}
 
-	return Subscription{cancel: cancel}, nil
+	return &subscription{cancel: cancel}, nil
 }
 
 func (sp *subPub) Publish(subject string, msg interface{}) error {

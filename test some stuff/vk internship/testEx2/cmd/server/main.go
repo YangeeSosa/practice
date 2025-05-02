@@ -76,7 +76,10 @@ func main() {
 	}
 
 	// Создаем новый pubsub
-	ps := subpub.NewSubPub()
+	ps, err := subpub.NewSubPub()
+	if err != nil {
+		log.Fatalf("Не удалось создать pubsub: %v", err)
+	}
 
 	// Создаем gRPC сервер
 	grpcServer := grpc.NewServer()
