@@ -2,7 +2,6 @@ package subpub
 
 import (
 	"context"
-	"errors"
 	"sync"
 )
 
@@ -35,12 +34,8 @@ type subPub struct {
 }
 
 func NewSubPub() (SubPub, error) {
-	subscribers := make(map[string][]chan interface{})
-	if subscribers == nil {
-		return nil, errors.New("не удалось создать map для подписчиков")
-	}
 	return &subPub{
-		subscribers: subscribers,
+		subscribers: make(map[string][]chan interface{}),
 	}, nil
 }
 
