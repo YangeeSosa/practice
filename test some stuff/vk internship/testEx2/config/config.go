@@ -1,12 +1,13 @@
 package config
 
 import (
-	"encoding/json"
 	"os"
+
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	GRPCPort string `json:"grpc_port"`
+	GRPCPort string `yaml:"grpc_port"`
 }
 
 func LoadConfig(path string) (*Config, error) {
@@ -17,7 +18,7 @@ func LoadConfig(path string) (*Config, error) {
 	defer file.Close()
 
 	var config Config
-	if err := json.NewDecoder(file).Decode(&config); err != nil {
+	if err := yaml.NewDecoder(file).Decode(&config); err != nil {
 		return nil, err
 	}
 

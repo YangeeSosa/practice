@@ -95,11 +95,8 @@ func (sp *subPub) Publish(subject string, msg interface{}) error {
 
 	// Отправляем сообщение всем подписчикам
 	for _, ch := range channels {
-		select {
-		case ch <- msg:
-			// Сообщение отправлено
-		default:
-			// Канал заполнен, пропускаем
+		if len(ch) < cap(ch) {
+			ch <- msg
 		}
 	}
 
